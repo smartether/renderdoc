@@ -968,7 +968,7 @@ struct GLDispatchTable
   PFNWGLDXLOCKOBJECTSNVPROC wglDXLockObjectsNV;
   PFNWGLDXUNLOCKOBJECTSNVPROC wglDXUnlockObjectsNV;
 
-  void* FMOD_System_CreateStream;
+  (void*) FMOD_System_CreateStream;
 };
 // clang-format on
 

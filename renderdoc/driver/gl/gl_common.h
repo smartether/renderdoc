@@ -2234,6 +2234,9 @@ enum class GLChunk : uint32_t
 
   ImplicitThreadSwitch,
 
+  // Fmod
+  FMOD_System_CreateStream,
+
   Max,
 };
 
