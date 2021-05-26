@@ -31,8 +31,11 @@
 // We need to disable clang-format since this struct is programmatically generated
 // clang-format off
 
+#define ForEachSupportedFmod(FUNC) \
+  FUNC(FMOD_System_CreateStream, FMOD_System_CreateStream);
 
-
+#define DefineSupportedHooksFmod() \
+  FuncWrapper4(int, FMOD_System_CreateStream, const char*, name_or_data, unsigned int, mode, void*, exinfo, void**, sound); \
 
 #define ForEachSupported(FUNC) \
   FUNC(glBindTexture, glBindTexture); \

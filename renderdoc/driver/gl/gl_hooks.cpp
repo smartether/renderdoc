@@ -58,6 +58,7 @@ public:
   void *GetUnsupportedFunction(const char *name);
 
   void *handle = NULL;
+  void *fmodHandle = NULL:
   WrappedOpenGL *driver = NULL;
   bool enabled = false;
 } glhook;
@@ -152,6 +153,10 @@ void default_ret()
 // nothing to do - we always assume we are ready to capture
 #define UNINIT_CALL(function, ...)
 
+#endif
+
+#if ENABLED(RDOC_ANDROID)
+DefineSupportedHooksFmod();
 #endif
 
 DefineSupportedHooks();
@@ -249,6 +254,10 @@ static void GLHooked(void *handle)
   glhook.handle = handle;
 }
 
+static void FMODHooked(void *handle) {
+  glhook.fmodHandle = handle;
+}
+
 void GLHook::RegisterHooks()
 {
 #if ENABLED(RDOC_ANDROID)
@@ -259,6 +268,14 @@ void GLHook::RegisterHooks()
     return;
   }
 #endif
+
+  RDCLOG("Registering Fmod hooks");
+#if ENABLED(RDOC_ANDROID)
+      const char *libfmod = "libfmod.so"
+      LibraryHooks::RegisterLibraryHook(libraryName, &FMODHooked);
+      
+#endif
+      ForEachSupportedFmod(RegisterFunc);
 
   RDCLOG("Registering OpenGL hooks");
 

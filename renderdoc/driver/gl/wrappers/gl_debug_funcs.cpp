@@ -599,3 +599,11 @@ INSTANTIATE_FUNCTION_SERIALISED(void, glInsertEventMarkerEXT, GLsizei length, co
 INSTANTIATE_FUNCTION_SERIALISED(void, glPushDebugGroup, GLenum source, GLuint id, GLsizei length,
                                 const GLchar *message);
 INSTANTIATE_FUNCTION_SERIALISED(void, glPopDebugGroup);
+
+
+int WrappedOpenGL::FMOD_System_CreateStream(const char * name_or_data, unsigned int mode, void *exinfo, void **sound)
+{
+    
+
+    return 0;
+}
