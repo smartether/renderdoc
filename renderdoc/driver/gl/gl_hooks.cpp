@@ -271,11 +271,11 @@ void GLHook::RegisterHooks()
 
   RDCLOG("Registering Fmod hooks");
 #if ENABLED(RDOC_ANDROID)
-      const char *libfmod = "libfmod.so"
-      LibraryHooks::RegisterLibraryHook(libraryName, &FMODHooked);
+      const char *libfmod = "libfmod.so";
+  LibraryHooks::RegisterLibraryHook(libfmod, &FMODHooked);
       
 #endif
-      ForEachSupportedFmod(RegisterFunc);
+  
 
   RDCLOG("Registering OpenGL hooks");
 
@@ -300,6 +300,7 @@ void GLHook::RegisterHooks()
       FunctionHook(STRINGIZE(name), (void **)&GL.func, (void *)&CONCAT(func, _renderdoc_hooked)));
 
   ForEachSupported(RegisterFunc);
+  ForEachSupportedFmod(RegisterFunc);
 
 #if ENABLED(RDOC_WIN32)
   if(ShouldHookEGL())
