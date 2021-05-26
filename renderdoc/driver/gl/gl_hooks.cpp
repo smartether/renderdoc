@@ -58,7 +58,7 @@ public:
   void *GetUnsupportedFunction(const char *name);
 
   void *handle = NULL;
-  void *fmodHandle = NULL:
+  void *fmodHandle = NULL;
   WrappedOpenGL *driver = NULL;
   bool enabled = false;
 } glhook;
