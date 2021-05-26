@@ -2528,6 +2528,9 @@ public:
   IMPLEMENT_FUNCTION_SERIALISED(void, glGetPerfQueryInfoINTEL, GLuint queryId,
                                 GLuint queryNameLength, GLchar *queryName, GLuint *dataSize,
                                 GLuint *noCounters, GLuint *noInstances, GLuint *capsMask);
+
+  IMPLEMENT_FUNCTION_SERIALISED(int, FMOD_System_CreateStream, const char *name_or_data,
+                                unsigned int mode, void *exinfo, void **sound);
 };
 
 class ScopedDebugContext
