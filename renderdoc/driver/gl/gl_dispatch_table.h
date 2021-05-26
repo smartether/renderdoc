@@ -31,6 +31,11 @@ class WrappedOpenGL;
 
 typedef std::function<void *(const char *)> PlatformGetProcAddr;
 
+
+// Fmod
+typedef int (*FMOD_SYSTEM_CREATESTREAM)(const char *name_or_data, unsigned int mode, void * exinfo, void **sound);
+
+
 // We need to disable clang-format since this struct is programmatically parsed
 // clang-format off
 struct GLDispatchTable
@@ -968,7 +973,7 @@ struct GLDispatchTable
   PFNWGLDXLOCKOBJECTSNVPROC wglDXLockObjectsNV;
   PFNWGLDXUNLOCKOBJECTSNVPROC wglDXUnlockObjectsNV;
 
-  (void*) FMOD_System_CreateStream;
+  FMOD_SYSTEM_CREATESTREAM FMOD_System_CreateStream;
 };
 // clang-format on
 
