@@ -591,6 +591,14 @@ void WrappedOpenGL::glGetObjectPtrLabel(const void *ptr, GLsizei bufSize, GLsize
   }
 }
 
+
+int WrappedOpenGL::FMOD_System_CreateStream(const char *name_or_data, unsigned int mode,
+                                            void *exinfo, void **sound)
+{
+  return 0;
+}
+
+
 INSTANTIATE_FUNCTION_SERIALISED(void, glObjectLabel, GLenum identifier, GLuint name, GLsizei length,
                                 const GLchar *label);
 INSTANTIATE_FUNCTION_SERIALISED(void, glDebugMessageInsert, GLenum source, GLenum type, GLuint id,
@@ -600,10 +608,3 @@ INSTANTIATE_FUNCTION_SERIALISED(void, glPushDebugGroup, GLenum source, GLuint id
                                 const GLchar *message);
 INSTANTIATE_FUNCTION_SERIALISED(void, glPopDebugGroup);
 
-
-int WrappedOpenGL::FMOD_System_CreateStream(const char * name_or_data, unsigned int mode, void *exinfo, void **sound)
-{
-    
-
-    return 0;
-}
