@@ -18,24 +18,43 @@ namespace WrapperGenerator
             "FMOD_File_GetDiskBusy",
             "FMOD_Thread_SetAttributes",
         };
-
+        static Dictionary<string,string> ParamTypeConvertion = new Dictionary<string,string>()
+        {
+            {"FMOD_SYSTEM","FMOD::System" },
+            {"FMOD_SOUND", "FMOD::Sound" },
+            {"FMOD_CHANNELCONTROL", "FMOD::ChannelControl" },
+            {"FMOD_CHANNEL", "FMOD::Channel" },
+            {"FMOD_CHANNELGROUP", "FMOD::ChannelGroup" },
+            {"FMOD_SOUNDGROUP","FMOD::SoundGroup" },
+            {"FMOD_REVERB3D", "FMOD::Reverb3D" },
+            {"FMOD_DSP", "FMOD::DSP" },
+            {"FMOD_DSPCONNECTION","FMOD::DSPConnection" },
+            {"FMOD_POLYGON", "FMOD::Polygon" },
+            {"FMOD_GEOMETRY", "FMOD::Geometry" },
+            //{"FMOD_SYNCPOINT", "FMOD::SyncPoint" },
+            {"FMOD_ASYNCREADINFO","FMOD::AsyncReadInfo" },
+            {"FMOD_BOOL", "bool" }
+        };
         static void Main(string[] args)
         {
             System.Console.Out.WriteLine("start...");
             var srcHeadPath = args.Length > 0 ? args[0] : string.Empty ;
             if (srcHeadPath == string.Empty)
             {
-                srcHeadPath = "F:\\Projects\\FmodHook\\app\\src\\main\\cpp\\fmodInc\\fmod.h";
+                srcHeadPath = "F:\\Projects\\FmodH\\app\\src\\main\\cpp\\fmodInc\\fmod.h";
             }
 
             StringBuilder strb = new StringBuilder();
+            strb.AppendLine("#include \"fmodInc/fmod.h\"");
+            strb.AppendLine("#include \"fmodInc/fmod.hpp\"");
             var headSrc = System.IO.File.ReadAllText(srcHeadPath);
             var regexFunc = new System.Text.RegularExpressions.Regex("FMOD_RESULT F_API FMOD_\\w+");
-            var regexParamType = new System.Text.RegularExpressions.Regex("\\(*\\,*(const\\s)*\\w+\\s");
+            var regexParamType = new System.Text.RegularExpressions.Regex("\\(*\\,*(unsigned\\s)*(const\\s)*(long\\s)*\\w+\\s");
             var regexParamName = new System.Text.RegularExpressions.Regex("\\**\\w+\\,*");
             var regexParam = new System.Text.RegularExpressions.Regex("\\((\\s*\\w+\\s\\**\\w+\\,*)*\\)\\;*");
             var regexPtr = new System.Text.RegularExpressions.Regex("\\*");
             var matchFunc = regexFunc.Match(headSrc);
+            List<string> paramTypeStack = new List<string>();
             List<string> paramNameStack = new List<string>();
             while (matchFunc.Success)
             {
@@ -53,9 +72,10 @@ namespace WrapperGenerator
                 var matchParam = regexParam.Match(headSrc, start, end);
                 if (matchParam.Success)
                 {
+                    paramTypeStack.Clear();
                     paramNameStack.Clear();
                     int paramIndex = 0;
-                    strb.Append(matchParam.Value);
+                    strb.Append(matchParam.Value.TrimEnd(';'));
                     strb.Append("\r{\r");
                     //Console.WriteLine(matchParam.Value);
                     int matchTypeStart = Math.Min(matchParam.Index + matchParam.Length, matchParam.Index + matchParam.Length);
@@ -80,6 +100,7 @@ namespace WrapperGenerator
                                 isPtr = matchName.Value.Contains("*");
                                 ptrCount = regexPtr.Matches(matchName.Value);
                             }
+                            paramTypeStack.Add(matchType.Value.Trim(',', '(', ')'));
                             paramNameStack.Add(matchName.Value.Trim(',', ' ', ')'));
                             matchTypeStart = Math.Min(matchParam.Index + matchParam.Length, matchName.Index + matchName.Length);
                             matchTypeEnd = Math.Min(Math.Max(0, matchParam.Index + matchParam.Length - matchTypeStart), headSrc.Length - matchTypeStart);
@@ -101,20 +122,41 @@ namespace WrapperGenerator
                             strb.Append(paramNameStack[i].Trim('(',' ' ,',','*'));
                             if (i != paramNameStack.Count - 1)
                             {
-                                strb.Append(",");
+                                strb.Append(", ");
                             }
                         }
                         strb.AppendLine(");");
                     }
                     else if (ptrCount.Count == 1)
                     {
-                        strb.Append("   return " + paramNameStack[0].TrimStart('(').TrimEnd(' ', ',').TrimStart('*') + (isPtr ? "->" : ".") + funcName + "(");
+                        //strb.AppendLine("   return FMOD_OK;");
+                        string funcNameLow = funcName;
+                        string firstChar = string.Join("", funcNameLow[0]).ToLower();
+                        funcNameLow = funcNameLow.TrimStart(funcNameLow[0]);
+                        funcNameLow = funcNameLow.Insert(0, firstChar);
+                        strb.Append("   return " + "((" + "FMOD::" + moduleName + "*)" + paramNameStack[0].TrimStart('(').TrimEnd(' ', ',').TrimStart('*') + ")" + (isPtr ? "->" : ".") + funcNameLow + "(");
                         for (int i = 1; i < paramNameStack.Count; i++)
                         {
-                            strb.Append(paramNameStack[i].Trim('(', ' ', ',', '*'));
+                            var matchPtrCount = regexPtr.Matches(paramNameStack[i]);
+                            var paramTypeStr = paramTypeStack[i].Trim('(', ' ', ',', '*');
+                            var paramNameStr = paramNameStack[i].Trim('(', ' ', ',', '*');
+                            if (ParamTypeConvertion.ContainsKey(paramTypeStr))
+                            {
+                                strb.Append("(" + ParamTypeConvertion[paramTypeStr]);
+                                for (int ptrIdx = 0; ptrIdx < matchPtrCount.Count; ptrIdx++)
+                                {
+                                    strb.Append("*");
+                                }
+                                strb.Append(")");
+                                strb.Append(paramNameStr);
+                            }
+                            else
+                            {
+                                strb.Append(paramNameStr);
+                            }
                             if (i != paramNameStack.Count - 1)
                             {
-                                strb.Append(",");
+                                strb.Append(", ");
                             }
                         }
                         strb.AppendLine(");");
@@ -127,11 +169,11 @@ namespace WrapperGenerator
                 {
                     Console.Out.Write("$$ matchParam failed..");
                 }
-                strb.Append("\r\r\r");
+                strb.Append("\r\r");
                 strb.Append("}\r");
                 matchFunc = matchFunc.NextMatch();
             }
-            System.IO.File.WriteAllText(System.IO.Path.GetDirectoryName(srcHeadPath) + "/fmod.cpp", strb.ToString());
+            System.IO.File.WriteAllText(System.IO.Path.GetDirectoryName(srcHeadPath).Replace("fmodInc", "") + "/fmod.cpp", strb.ToString());
 
         }
     }
