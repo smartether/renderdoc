@@ -253,10 +253,11 @@ static void GLHooked(void *handle)
   // pointers
   glhook.handle = handle;
 }
-
+#if ENABLED(RDOC_ANDROID)
 static void FMODHooked(void *handle) {
   glhook.fmodHandle = handle;
 }
+#endif
 
 void GLHook::RegisterHooks()
 {
@@ -300,7 +301,9 @@ void GLHook::RegisterHooks()
       FunctionHook(STRINGIZE(name), (void **)&GL.func, (void *)&CONCAT(func, _renderdoc_hooked)));
 
   ForEachSupported(RegisterFunc);
+#if ENABLED(RDOC_ANDROID)
   ForEachSupportedFmod(RegisterFunc);
+#endif
 
 #if ENABLED(RDOC_WIN32)
   if(ShouldHookEGL())

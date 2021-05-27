@@ -5023,6 +5023,7 @@ bool WrappedOpenGL::ProcessChunk(ReadSerialiser &ser, GLChunk chunk)
              ToStr(chunk).c_str());
       ser.SkipCurrentChunk();
       return false;
+    case GLChunk::FMOD_System_CreateStream: return false;
   }
 
   return false;

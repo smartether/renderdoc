@@ -361,6 +361,8 @@ void initAdb()
   {
     RDCLOG("Started adb server");
   }
+
+  //execCommand(adb, "connect 127.0.0.1:7555", workdir, true);
 }
 void shutdownAdb()
 {

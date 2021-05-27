@@ -102,6 +102,8 @@ ABI GetABI(const rdcstr &abiName)
     return ABI::arm64_v8a;
   else if(abiName == "x86-v7a")
     return ABI::x86;
+  else if(abiName == "x86")
+    return ABI::armeabi_v7a;
   else if(abiName == "x86_64")
     return ABI::x86_64;
 
